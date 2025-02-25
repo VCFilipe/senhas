@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Permissao {
+  id        Int       @id @default(autoincrement())
+  nome      String    @unique
+  descricao String?
+  usuarios  Usuario[] // Relacionamento muitos-para-muitos
+}
+
+model Usuario {
+  id            Int          @id @default(autoincrement())
+  email         String       @unique
+  senha         String
+  permissoes    Permissao[] // Relacionamento muitos-para-muitos
+  funcionario   Funcionario? @relation(fields: [funcionarioId], references: [id])
+  funcionarioId Int?
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+}
+
+model Setor {
+  id          Int           @id @default(autoincrement())
+  nome        String
+  tipo        String
+  funcionario Funcionario[]
+  Senha       Senha[]
+}
+
+model Funcionario {
+  id      Int       @id @default(autoincrement())
+  nome    String
+  setor   Setor     @relation(fields: [setorId], references: [id])
+  setorId Int
+  usuario Usuario[]
+}
+
+model Senha {
+  id           Int      @id @default(autoincrement())
+  numero       String
+  setor        Setor    @relation(fields: [setorId], references: [id])
+  setorId      Int
+  status       String
+  data_criacao DateTime @default(now())
+}
